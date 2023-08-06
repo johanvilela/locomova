@@ -4,6 +4,10 @@
   "description": "✨ The best CRUD ever",
   "main": "index.js",
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
     "start:crud": "npx ts-node ./core/crud.ts",
     "dev:crud": "nodemon --ext ts,tsx --exec 'npm run start:crud'",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,10 +19,14 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.4.7",
+    "@types/react": "18.2.18",
     "@types/uuid": "^9.0.2",
     "nodemon": "^3.0.1"
   },
   "dependencies": {
+    "next": "^13.4.12",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "typescript": "^5.1.6",
     "uuid": "^9.0.0"
   }
