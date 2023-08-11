@@ -1,8 +1,13 @@
-async function get() {
-  return fetch("/api/todos").then(async (serverResponse) => {
-    const todosString = await serverResponse.text();
-    const todosFromServer = JSON.parse(todosString).todos;
-    return todosFromServer;
+import { todoRepository } from "@ui/repository/todo";
+
+interface TodoControllerGetParams {
+  page?: number;
+}
+async function get({ page }: TodoControllerGetParams = {}) {
+  // Fazer a lógica para pegar os dados
+  return todoRepository.get({
+    page: page || 1,
+    limit: 10,
   });
 }
 
