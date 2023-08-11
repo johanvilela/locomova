@@ -4,7 +4,7 @@ import { v4 as uuid } from "uuid";
 
 const DB_FILE_PATH = "./core/db";
 
-console.log("[Amazing CRUD]");
+// console.log("[Amazing CRUD]");
 
 type UUID = string;
 
@@ -39,7 +39,7 @@ function create(content: string): Todo {
   return todo;
 }
 
-function read(): Array<Todo> {
+export function read(): Array<Todo> {
   const dbString = fs.readFileSync(DB_FILE_PATH, "utf-8");
   const db = JSON.parse(dbString || "{}");
   if (!db.todos) {
@@ -107,12 +107,12 @@ function CLEAR_DB() {
 }
 
 // [SIMULATION]
-CLEAR_DB();
-create("Fisrt TODO");
-const secondTodo = create("Second TODO");
-deleteById(secondTodo.id);
-const thirdTodo = create("Third TODO");
-updateContentById(thirdTodo.id, "Third TODO with new content!");
-const todos = read();
-console.log(todos);
-console.log(todos.length);
+// CLEAR_DB();
+// create("Fisrt TODO");
+// const secondTodo = create("Second TODO");
+// deleteById(secondTodo.id);
+// const thirdTodo = create("Third TODO");
+// updateContentById(thirdTodo.id, "Third TODO with new content!");
+// const todos = read();
+// console.log(todos);
+// console.log(todos.length);
