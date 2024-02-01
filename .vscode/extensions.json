@@ -3,6 +3,7 @@
         "rangav.vscode-thunder-client",
         "EditorConfig.EditorConfig",
         "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "wallabyjs.quokka-vscode"
     ]
 }
