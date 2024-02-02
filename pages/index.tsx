@@ -1,6 +1,6 @@
 import { GlobalStyles } from "@ui/theme/globaStyles";
 import { todoController } from "@ui/controller/todo";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const bg = "/background.jpg"; // Inside public folder
 
@@ -10,18 +10,21 @@ interface HomeTodo {
 }
 
 export default function Page() {
-  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const initialLoadComplete = useRef(false);
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [todos, setTodos] = useState<HomeTodo[]>([]);
+  const homeTodos = todoController.filterTodosByContent<HomeTodo>(
+    search,
+    todos
+  );
   const hasMorePages = totalPages > page;
-  const hasNoTodos = todos.length === 0 && !isLoading;
+  const hasNoTodos = homeTodos.length === 0 && !isLoading;
 
-  // Load infos onload
   useEffect(() => {
-    setInitialLoadComplete(true);
-    if (!initialLoadComplete) {
+    if (!initialLoadComplete.current) {
       todoController
         .get({ page })
         .then(({ todos, pages }) => {
@@ -30,6 +33,7 @@ export default function Page() {
         })
         .finally(() => {
           setIsLoading(false);
+          initialLoadComplete.current = true;
         });
     }
   }, [page]);
@@ -54,7 +58,14 @@ export default function Page() {
 
       <section>
         <form>
-          <input type="text" placeholder="Filtrar lista atual, ex: Dentista" />
+          <input
+            type="text"
+            placeholder="Filtrar lista atual, ex: Dentista"
+            value={search}
+            onChange={function handleSearch(event) {
+              setSearch(event.target.value);
+            }}
+          />
         </form>
 
         <table border={1}>
@@ -70,7 +81,7 @@ export default function Page() {
           </thead>
 
           <tbody>
-            {todos.map((currentTodo) => {
+            {homeTodos.map((currentTodo) => {
               return (
                 <tr key={currentTodo.id}>
                   <td>
