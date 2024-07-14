@@ -7,6 +7,7 @@ const bg = "/background.jpg"; // Inside public folder
 interface HomeTodo {
   id: string;
   content: string;
+  done: boolean;
 }
 
 export default function Page() {
@@ -108,14 +109,41 @@ export default function Page() {
           </thead>
 
           <tbody>
-            {homeTodos.map((currentTodo) => {
+            {homeTodos.map((todo) => {
               return (
-                <tr key={currentTodo.id}>
+                <tr key={todo.id}>
                   <td>
-                    <input type="checkbox" />
+                    <input
+                      type="checkbox"
+                      checked={todo.done}
+                      onChange={function handleToogle() {
+                        todoController.toggleDone({
+                          id: todo.id,
+                          onError() {
+                            alert("Falha ao atualizar a TODO :(");
+                          },
+                          updateTodoOnScreen() {
+                            setTodos((currentTodos) => {
+                              return currentTodos.map((currentTodo) => {
+                                if (currentTodo.id === todo.id) {
+                                  return {
+                                    ...currentTodo,
+                                    done: !currentTodo.done,
+                                  };
+                                }
+                                return currentTodo;
+                              });
+                            });
+                          },
+                        });
+                      }}
+                    />
                   </td>
-                  <td>{currentTodo.id.substring(0, 4)}</td>
-                  <td>{currentTodo.content}</td>
+                  <td>{todo.id.substring(0, 4)}</td>
+                  <td>
+                    {!todo.done && todo.content}
+                    {todo.done && <s>{todo.content}</s>}
+                  </td>
                   <td align="right">
                     <button data-type="delete">Apagar</button>
                   </td>
