@@ -6,7 +6,6 @@ interface TodoControllerGetParams {
   page: number;
 }
 async function get(params: TodoControllerGetParams) {
-  // Fazer a lógica para pegar os dados
   return todoRepository.get({
     page: params.page,
     limit: 2,
@@ -68,9 +67,15 @@ function toggleDone({
     });
 }
 
+async function deleteById(id: string): Promise<void> {
+  const todoId = id;
+  await todoRepository.deleteById(todoId);
+}
+
 export const todoController = {
   get,
   filterTodosByContent,
   create,
   toggleDone,
+  deleteById,
 };
