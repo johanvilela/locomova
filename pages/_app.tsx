@@ -1,5 +1,10 @@
+import { Button } from "@/components/ui/button";
 import "../styles/global.css";
 
 export default function Page() {
-  return <h1 className="text-3xl font-bold underline">New Homepage</h1>;
+  return (
+    <div>
+      <Button>CLick</Button>
+    </div>
+  );
 }
