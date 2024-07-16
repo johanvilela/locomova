@@ -1,17 +1,19 @@
+import { vehicleController } from "@server/controller/vehicle";
 import { NextApiRequest, NextApiResponse } from "next";
-import { todoController } from "@server/controller/todo";
 
 export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
   if (request.method === "GET") {
-    await todoController.get(request, response);
+    await vehicleController.get(request, response);
     return;
   }
 
   if (request.method === "POST") {
-    await todoController.create(request, response);
+    response.status(200).json({
+      message: "POST vehicles",
+    });
     return;
   }
 

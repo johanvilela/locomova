@@ -4,5 +4,5 @@ export default function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
-  response.status(200).json({ message: "Olá mundo!" });
+  response.status(200).json({ message: "Essa é a API do Locomova!" });
 }
