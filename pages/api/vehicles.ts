@@ -11,9 +11,7 @@ export default async function handler(
   }
 
   if (request.method === "POST") {
-    response.status(200).json({
-      message: "POST vehicles",
-    });
+    await vehicleController.create(request, response);
     return;
   }
 
