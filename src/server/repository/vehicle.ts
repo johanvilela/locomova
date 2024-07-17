@@ -1,5 +1,9 @@
 import { supabase } from "@server/infra/db/supabase";
-import { Vehicle, VehicleSchema } from "@server/schema/vehicle";
+import {
+  Vehicle,
+  VehicleSchema,
+  createNewVehicleParams,
+} from "@server/schema/vehicle";
 
 interface VehicleRepositoryGetOutput {
   vehicles: Vehicle[];
@@ -18,16 +22,11 @@ async function get(): Promise<VehicleRepositoryGetOutput> {
   return { vehicles };
 }
 
-interface createNewVehicleParams {
-  name: string;
-  manufacturer: string;
-  model: string;
-}
-
 async function createNewVehicle({
   name,
   manufacturer,
   model,
+  price,
 }: createNewVehicleParams): Promise<Vehicle> {
   const { data, error } = await supabase
     .from("vehicles")
@@ -36,6 +35,7 @@ async function createNewVehicle({
         name,
         manufacturer,
         model,
+        price,
       },
     ])
     .select()

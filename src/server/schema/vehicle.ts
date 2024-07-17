@@ -8,21 +8,18 @@ export const VehicleSchema = schema.object({
   name: schema.string().min(1),
   manufacturer: schema.string().min(1),
   model: schema.string().min(1),
+  price: schema.number(),
 });
 
 export type Vehicle = schema.infer<typeof VehicleSchema>;
-
-// // Model/Schema
-// interface Vehicle {
-//   id: string;
-//   created_at: string;
-//   name: string;
-//   manufacturer: string;
-//   model: string;
-// }
 
 export const VehicleCreateBodySchema = schema.object({
   name: schema.string().min(1),
   manufacturer: schema.string().min(1),
   model: schema.string().min(1),
+  price: schema.number(),
 });
+
+export type createNewVehicleParams = schema.infer<
+  typeof VehicleCreateBodySchema
+>;
