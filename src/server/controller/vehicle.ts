@@ -1,6 +1,6 @@
 import { vehicleRepository } from "@server/repository/vehicle";
 import { NextApiRequest, NextApiResponse } from "next";
-import { z as schema } from "zod";
+import { VehicleCreateBodySchema } from "@server/schema/vehicle";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -17,12 +17,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
     });
   }
 }
-
-const VehicleCreateBodySchema = schema.object({
-  name: schema.string().min(1),
-  manufacturer: schema.string().min(1),
-  model: schema.string().min(1),
-});
 
 async function create(req: NextApiRequest, res: NextApiResponse) {
   const parsedBody = VehicleCreateBodySchema.safeParse(req.body);
