@@ -25,3 +25,18 @@ export const VehicleCreateBodySchema = schema.object({
 export type createNewVehicleParams = schema.infer<
   typeof VehicleCreateBodySchema
 >;
+
+export const GetVehiclesQuerySchema = schema.object({
+  page: schema
+    .string({
+      required_error: "Required URL Search Param: `page`",
+    })
+    .min(1)
+    .transform((page) => Number(page)),
+  limit: schema
+    .string({
+      required_error: "Required URL Search Param: `limit`",
+    })
+    .min(1)
+    .transform((page) => Number(page)),
+});

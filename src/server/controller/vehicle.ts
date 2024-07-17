@@ -1,12 +1,33 @@
 import { vehicleRepository } from "@server/repository/vehicle";
 import { NextApiRequest, NextApiResponse } from "next";
-import { VehicleCreateBodySchema } from "@server/schema/vehicle";
+import {
+  GetVehiclesQuerySchema,
+  VehicleCreateBodySchema,
+} from "@server/schema/vehicle";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
+  const urlSearchParams = req.query;
+  const parsedQuery = GetVehiclesQuerySchema.safeParse(urlSearchParams);
+  if (!parsedQuery.success) {
+    res.status(400).json({
+      error: {
+        message: "Invalid query",
+        description: parsedQuery.error.issues,
+      },
+    });
+    return;
+  }
+  const params = parsedQuery.data;
+
   try {
-    const output = await vehicleRepository.get();
+    const output = await vehicleRepository.get({
+      page: params.page,
+      limit: params.limit,
+    });
 
     res.status(200).json({
+      total: output.total,
+      pages: output.pages,
       vehicles: output.vehicles,
     });
   } catch (error) {

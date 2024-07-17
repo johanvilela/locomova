@@ -5,12 +5,34 @@ import {
   createNewVehicleParams,
 } from "@server/schema/vehicle";
 
+interface VehicleRepositoryGetParams {
+  page?: number;
+  limit?: number;
+}
 interface VehicleRepositoryGetOutput {
   vehicles: Vehicle[];
+  total: number;
+  pages: number;
 }
 
-async function get(): Promise<VehicleRepositoryGetOutput> {
-  const { data, error } = await supabase.from("vehicles").select("*");
+async function get({
+  page,
+  limit,
+}: VehicleRepositoryGetParams): Promise<VehicleRepositoryGetOutput> {
+  const currentPage = page || 1;
+  const currentLimit = limit || 10;
+  const startIndex = (currentPage - 1) * currentLimit;
+  const endIndex = currentPage * currentLimit - 1;
+
+  const { data, error, count } = await supabase
+    .from("vehicles")
+    .select("*", {
+      count: "exact",
+    })
+    .order("price", {
+      ascending: true,
+    })
+    .range(startIndex, endIndex);
   if (error) throw new Error("Failed to fetch data");
 
   const parsedData = VehicleSchema.array().safeParse(data);
@@ -18,8 +40,14 @@ async function get(): Promise<VehicleRepositoryGetOutput> {
     throw new Error("Failed to parse vehicles from database");
 
   const vehicles = parsedData.data;
+  const total = count || data.length;
+  const totalPages = Math.ceil(total / currentLimit);
 
-  return { vehicles };
+  return {
+    vehicles,
+    total,
+    pages: totalPages,
+  };
 }
 
 async function createNewVehicle({
