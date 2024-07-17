@@ -37,7 +37,7 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
     );
 
     res.status(201).json({
-      vehicle: createdVehicle,
+      vehicleId: createdVehicle.id,
     });
   } catch (error) {
     res.status(500).json({
