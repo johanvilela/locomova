@@ -27,6 +27,7 @@ async function createNewVehicle({
   manufacturer,
   model,
   price,
+  image_path,
 }: createNewVehicleParams): Promise<Vehicle> {
   const { data, error } = await supabase
     .from("vehicles")
@@ -36,6 +37,7 @@ async function createNewVehicle({
         manufacturer,
         model,
         price,
+        image_path,
       },
     ])
     .select()
