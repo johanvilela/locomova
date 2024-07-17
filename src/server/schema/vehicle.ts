@@ -40,3 +40,7 @@ export const GetVehiclesQuerySchema = schema.object({
     .min(1)
     .transform((page) => Number(page)),
 });
+
+export const DeleteVehicleQuerySchema = schema.object({
+  id: schema.string().uuid().min(1),
+});

@@ -1,9 +1,11 @@
 import { vehicleRepository } from "@server/repository/vehicle";
 import { NextApiRequest, NextApiResponse } from "next";
 import {
+  DeleteVehicleQuerySchema,
   GetVehiclesQuerySchema,
   VehicleCreateBodySchema,
 } from "@server/schema/vehicle";
+import { HttpNotFoundError } from "@server/infra/error";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const urlSearchParams = req.query;
@@ -69,7 +71,40 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
+async function deleteById(req: NextApiRequest, res: NextApiResponse) {
+  const urlParams = req.query;
+  const parsedQuery = DeleteVehicleQuerySchema.safeParse(urlParams);
+  if (!parsedQuery.success) {
+    return res.status(400).json({
+      error: {
+        message: "You must to provide a valid id",
+      },
+    });
+  }
+
+  try {
+    const vehicleId = parsedQuery.data.id;
+    await vehicleRepository.deleteById(vehicleId);
+    res.status(204).end();
+  } catch (err) {
+    if (err instanceof HttpNotFoundError) {
+      res.status(err.status).json({
+        error: {
+          message: err.message,
+        },
+      });
+    }
+
+    res.status(500).json({
+      error: {
+        message: "Internal server error",
+      },
+    });
+  }
+}
+
 export const vehicleController = {
   get,
   create,
+  deleteById,
 };

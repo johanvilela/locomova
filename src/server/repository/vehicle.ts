@@ -4,6 +4,7 @@ import {
   VehicleSchema,
   createNewVehicleParams,
 } from "@server/schema/vehicle";
+import { HttpNotFoundError } from "@server/infra/error";
 
 interface VehicleRepositoryGetParams {
   page?: number;
@@ -77,7 +78,14 @@ async function createNewVehicle({
   return parsedVehicle;
 }
 
+async function deleteById(id: string) {
+  const { error } = await supabase.from("vehicles").delete().match({ id });
+
+  if (error) throw new HttpNotFoundError(`Vehicle with id "${id}" not found`);
+}
+
 export const vehicleRepository = {
   get,
   createNewVehicle,
+  deleteById,
 };
