@@ -2,7 +2,7 @@ import { supabase } from "@server/infra/db/supabase";
 import {
   Vehicle,
   VehicleSchema,
-  createNewVehicleParams,
+  CreateNewVehicleParams,
 } from "@server/schema/vehicle";
 import { HttpNotFoundError } from "@server/infra/error";
 
@@ -57,7 +57,7 @@ async function createNewVehicle({
   model,
   price,
   image_path,
-}: createNewVehicleParams): Promise<Vehicle> {
+}: CreateNewVehicleParams): Promise<Vehicle> {
   const { data, error } = await supabase
     .from("vehicles")
     .insert([

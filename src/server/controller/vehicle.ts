@@ -5,7 +5,7 @@ import {
   GetVehiclesQuerySchema,
   UpdateVehicleBodySchema,
   UpdateVehicleQuerySchema,
-  VehicleCreateBodySchema,
+  CreateVehicleBodySchema,
 } from "@server/schema/vehicle";
 import { HttpNotFoundError } from "@server/infra/error";
 
@@ -44,7 +44,7 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function create(req: NextApiRequest, res: NextApiResponse) {
-  const parsedBody = VehicleCreateBodySchema.safeParse(req.body);
+  const parsedBody = CreateVehicleBodySchema.safeParse(req.body);
   if (!parsedBody.success) {
     res.status(400).json({
       error: {
