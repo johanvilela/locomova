@@ -1,19 +1,27 @@
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import VehicleCard from "@/components/vehicleCard";
 import { vehicleController } from "@/src/ui/controller/vehicle";
 import { Vehicle } from "@/src/ui/schema/vehicle";
 import { useEffect, useState } from "react";
 
 export default function Page() {
-  const [page] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    vehicleController.get({ page }).then(({ vehicles, pages }) => {
+    vehicleController.get({ page: currentPage }).then(({ vehicles, pages }) => {
       setVehicles(vehicles);
       setTotalPages(pages);
     });
-  }, []);
+  }, [currentPage]);
 
   return (
     <>
@@ -21,20 +29,64 @@ export default function Page() {
         <header className="text-xl md:text-3xl font-serif font-bold text-slate-600 select-none">
           · LOCOMOVA ·
         </header>
-        {/* Car Grid */}
-        <main className="w-full max-w-[800px] grid grid-cols-1 md:grid-cols-2 gap-4 px-4 lg:px-0">
-          {vehicles.map((vehicle) => {
-            return (
-              <VehicleCard
-                key={vehicle.id}
-                manufacturer={vehicle.manufacturer}
-                name={vehicle.name}
-                model={vehicle.model}
-                price={vehicle.price}
-                imagePath={vehicle.image_path}
-              />
-            );
-          })}
+
+        <main className="flex flex-col gap-4 w-full items-center">
+          {/* Car Grid */}
+          <div className="w-full max-w-[800px] grid grid-cols-1 md:grid-cols-2 gap-4 px-4 lg:px-0 ">
+            {vehicles.map((vehicle) => {
+              return (
+                <VehicleCard
+                  key={vehicle.id}
+                  manufacturer={vehicle.manufacturer}
+                  name={vehicle.name}
+                  model={vehicle.model}
+                  price={vehicle.price}
+                  imagePath={vehicle.image_path}
+                />
+              );
+            })}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => {
+                      if (currentPage > 1) setCurrentPage(currentPage - 1);
+                    }}
+                  />
+                </PaginationItem>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => {
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          isActive={page === currentPage}
+                          onClick={() => {
+                            setCurrentPage(page);
+                          }}
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  }
+                )}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => {
+                      if (currentPage < totalPages)
+                        setCurrentPage(currentPage + 1);
+                    }}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          )}
         </main>
       </div>
     </>
