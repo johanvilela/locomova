@@ -1,10 +1,7 @@
-import { Button } from "@/components/ui/button";
+import { AppProps } from "next/app";
 import "../styles/global.css";
 
-export default function Page() {
-  return (
-    <div>
-      <Button>CLick</Button>
-    </div>
-  );
-}
+const MyApp = ({ Component, pageProps }: AppProps) => {
+  return <Component {...pageProps} />;
+};
+export default MyApp;
