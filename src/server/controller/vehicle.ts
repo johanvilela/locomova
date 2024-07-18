@@ -3,6 +3,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import {
   DeleteVehicleQuerySchema,
   GetVehiclesQuerySchema,
+  UpdateVehicleBodySchema,
+  UpdateVehicleQuerySchema,
   VehicleCreateBodySchema,
 } from "@server/schema/vehicle";
 import { HttpNotFoundError } from "@server/infra/error";
@@ -70,6 +72,52 @@ async function create(req: NextApiRequest, res: NextApiResponse) {
     });
   }
 }
+async function updateById(req: NextApiRequest, res: NextApiResponse) {
+  // Validate url params
+  const urlParams = req.query;
+  const parsedQuery = UpdateVehicleQuerySchema.safeParse(urlParams);
+  if (!parsedQuery.success) {
+    return res.status(400).json({
+      error: {
+        message: "You must to provide a valid id",
+      },
+    });
+  }
+  const vehicleId = parsedQuery.data.id;
+
+  // Validate body schema
+  const parsedBody = UpdateVehicleBodySchema.safeParse(req.body);
+  if (!parsedBody.success) {
+    res.status(400).json({
+      error: {
+        message: "Invalid body data format",
+        description: parsedBody.error.issues,
+      },
+    });
+    return;
+  }
+  const vehicleData = parsedBody.data;
+
+  try {
+    const updatedVehicle = await vehicleRepository.updateById({
+      id: vehicleId,
+      ...vehicleData,
+    });
+
+    res.status(200).json({
+      vehicle_id: updatedVehicle.id,
+    });
+    res.status(200).end();
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(404).json({
+        error: {
+          message: err.message,
+        },
+      });
+    }
+  }
+}
 
 async function deleteById(req: NextApiRequest, res: NextApiResponse) {
   const urlParams = req.query;
@@ -106,5 +154,6 @@ async function deleteById(req: NextApiRequest, res: NextApiResponse) {
 export const vehicleController = {
   get,
   create,
+  updateById,
   deleteById,
 };

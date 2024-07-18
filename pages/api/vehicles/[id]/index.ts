@@ -5,6 +5,11 @@ export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
+  if (request.method === "PUT") {
+    await vehicleController.updateById(request, response);
+    return;
+  }
+
   if (request.method === "DELETE") {
     await vehicleController.deleteById(request, response);
     return;

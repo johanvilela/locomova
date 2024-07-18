@@ -78,6 +78,35 @@ async function createNewVehicle({
   return parsedVehicle;
 }
 
+async function updateById({
+  id,
+  name,
+  manufacturer,
+  model,
+  price,
+  image_path,
+}: Partial<Vehicle>): Promise<Vehicle> {
+  const { data, error } = await supabase
+    .from("vehicles")
+    .update({
+      name,
+      manufacturer,
+      model,
+      price,
+      image_path,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) throw new Error("Failed to get vehicle by id");
+
+  const parsedData = VehicleSchema.safeParse(data);
+  if (!parsedData.success) throw new Error("Failed to return updated vehicle");
+
+  return parsedData.data;
+}
+
 async function deleteById(id: string) {
   const { error } = await supabase.from("vehicles").delete().match({ id });
 
@@ -87,5 +116,6 @@ async function deleteById(id: string) {
 export const vehicleRepository = {
   get,
   createNewVehicle,
+  updateById,
   deleteById,
 };

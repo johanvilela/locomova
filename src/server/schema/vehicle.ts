@@ -14,6 +14,7 @@ export const VehicleSchema = schema.object({
 
 export type Vehicle = schema.infer<typeof VehicleSchema>;
 
+// TODO: rename to CreateVehicleBodySchema
 export const VehicleCreateBodySchema = schema.object({
   name: schema.string().min(1),
   manufacturer: schema.string().min(1),
@@ -22,6 +23,7 @@ export const VehicleCreateBodySchema = schema.object({
   image_path: schema.string().min(1),
 });
 
+// TODO: rename to CreateNewVehicleParams
 export type createNewVehicleParams = schema.infer<
   typeof VehicleCreateBodySchema
 >;
@@ -40,6 +42,20 @@ export const GetVehiclesQuerySchema = schema.object({
     .min(1)
     .transform((page) => Number(page)),
 });
+
+export const UpdateVehicleQuerySchema = schema.object({
+  id: schema.string().uuid().min(1),
+});
+
+export const UpdateVehicleBodySchema = schema.object({
+  name: schema.string().min(1),
+  manufacturer: schema.string().min(1),
+  model: schema.string().min(1),
+  price: schema.number(),
+  image_path: schema.string().min(1),
+});
+
+export type UpdateVehicleParams = schema.infer<typeof UpdateVehicleBodySchema>;
 
 export const DeleteVehicleQuerySchema = schema.object({
   id: schema.string().uuid().min(1),
