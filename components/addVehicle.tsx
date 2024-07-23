@@ -15,6 +15,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { NewVehicleFormInputs, NewVehicleFormSchema } from "@ui/schema/vehicle";
 import { vehicleController } from "@ui/controller/vehicle";
+import { toast } from "react-toastify";
 
 export default function AddVehicle() {
   const {
@@ -36,15 +37,13 @@ export default function AddVehicle() {
     vehicleController.create({
       vehicle: data,
       onSuccess() {
-        // TODO: mostrar toast
-        alert("Sucesso ao adicionar veículo");
+        toast.success("Veículo adicionado");
         reset();
       },
       onError() {
-        alert("Erro ao adicionar veículo");
+        toast.error("Erro ao adicionar veículo");
       },
     });
-    // console.log(data);
   };
 
   return (
