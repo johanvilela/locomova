@@ -1,4 +1,4 @@
-import { Vehicle, VehicleSchema } from "@ui/schema/vehicle";
+import { NewVehicle, Vehicle, VehicleSchema } from "@ui/schema/vehicle";
 import { z as schema } from "zod";
 
 interface VehicleRepositoryGetParams {
@@ -39,6 +39,26 @@ function get({
   );
 }
 
+async function create(vehicle: NewVehicle): Promise<void> {
+  const response = await fetch("api/vehicles", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ...vehicle,
+      image_path: "/cars/example-car.jpg",
+    }),
+  });
+
+  if (response.ok) {
+    return;
+  }
+
+  throw new Error("Failed to create vehicle");
+}
+
 export const vehicleRepository = {
   get,
+  create,
 };

@@ -1,3 +1,4 @@
+import AddVehicle from "@/components/addVehicle";
 import {
   Pagination,
   PaginationContent,
@@ -87,6 +88,8 @@ export default function Page() {
               </PaginationContent>
             </Pagination>
           )}
+          {/* Add a new vehicle */}
+          <AddVehicle />
         </main>
       </div>
     </>
