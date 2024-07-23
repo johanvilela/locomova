@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { NewVehicleFormInputs, NewVehicleFormSchema } from "@ui/schema/vehicle";
@@ -50,9 +50,9 @@ export default function AddVehicle() {
     <form>
       <Dialog>
         <DialogTrigger asChild>
-          <Button>
-            <Plus className="mr-2" size={20} />
-            Adicionar veículo
+          <Button size="sm" className="h-8 gap-1">
+            <PlusCircle className="h-3.5 w-3.5" />
+            <span>Adicionar veículo</span>
           </Button>
         </DialogTrigger>
 

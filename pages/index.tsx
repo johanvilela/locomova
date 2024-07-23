@@ -1,4 +1,3 @@
-import AddVehicle from "@/components/addVehicle";
 import {
   Pagination,
   PaginationContent,
@@ -8,20 +7,24 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import VehicleCard from "@/components/vehicleCard";
-import { vehicleController } from "@/src/ui/controller/vehicle";
-import { Vehicle } from "@/src/ui/schema/vehicle";
+import { vehicleController } from "@ui/controller/vehicle";
+import { Vehicle } from "@ui/schema/vehicle";
 import { useEffect, useState } from "react";
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState(1);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalVehicles, setTotalVehicles] = useState(0);
 
   useEffect(() => {
-    vehicleController.get({ page: currentPage }).then(({ vehicles, pages }) => {
-      setVehicles(vehicles);
-      setTotalPages(pages);
-    });
+    vehicleController
+      .get({ page: currentPage })
+      .then(({ vehicles, pages, total }) => {
+        setVehicles(vehicles);
+        setTotalPages(pages);
+        setTotalVehicles(total);
+      });
   }, [currentPage]);
 
   return (
@@ -50,46 +53,56 @@ export default function Page() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => {
-                      if (currentPage > 1) setCurrentPage(currentPage - 1);
-                    }}
-                  />
-                </PaginationItem>
+            <>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => {
+                        if (currentPage > 1) setCurrentPage(currentPage - 1);
+                      }}
+                    />
+                  </PaginationItem>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => {
-                    return (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          isActive={page === currentPage}
-                          onClick={() => {
-                            setCurrentPage(page);
-                          }}
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    );
-                  }
-                )}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => {
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            isActive={page === currentPage}
+                            onClick={() => {
+                              setCurrentPage(page);
+                            }}
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    }
+                  )}
 
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => {
-                      if (currentPage < totalPages)
-                        setCurrentPage(currentPage + 1);
-                    }}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => {
+                        if (currentPage < totalPages)
+                          setCurrentPage(currentPage + 1);
+                      }}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+              <div className="text-xs text-muted-foreground">
+                Exibindo{" "}
+                <strong>
+                  {currentPage * 10 - 9}-
+                  {currentPage === totalPages
+                    ? totalVehicles
+                    : currentPage * 10}
+                </strong>{" "}
+                de <strong>{totalVehicles}</strong> veículos
+              </div>
+            </>
           )}
-          {/* Add a new vehicle */}
-          <AddVehicle />
         </main>
       </div>
     </>
