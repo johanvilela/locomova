@@ -32,7 +32,12 @@ function create({
   });
 }
 
+async function deleteById(id: string) {
+  await vehicleRepository.deleteById(id);
+}
+
 export const vehicleController = {
   get,
   create,
+  deleteById,
 };

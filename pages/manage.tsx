@@ -52,6 +52,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { toast } from "react-toastify";
 
 export default function Manage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -252,10 +253,21 @@ export default function Manage() {
                                   Editar
                                   {/* TODO: implements update */}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="gap-1">
+                                <DropdownMenuItem
+                                  className="gap-1"
+                                  onClick={() => {
+                                    vehicleController
+                                      .deleteById(vehicle.id)
+                                      .then(() => {
+                                        toast.success("Veículo excluído");
+                                      })
+                                      .catch(() => {
+                                        toast.error("Não foi possível excluir");
+                                      });
+                                  }}
+                                >
                                   <Trash2 className="h-3.5 w-3.5" />
                                   Excluir
-                                  {/* TODO: implements delete */}
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
