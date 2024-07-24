@@ -241,10 +241,12 @@ export default function Manage() {
                 <Settings className="h-5 w-5" />
                 Gerenciar
               </DropdownMenuItem>
-              <DropdownMenuItem className="gap-1">
-                <LogOut className="h-5 w-5" />
-                Sair
-              </DropdownMenuItem>
+              <Link href={"/"}>
+                <DropdownMenuItem className="gap-1">
+                  <LogOut className="h-5 w-5" />
+                  Sair
+                </DropdownMenuItem>
+              </Link>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
