@@ -41,8 +41,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import AddVehicle from "@/components/addVehicle";
-import { useEffect, useState } from "react";
-import { Vehicle } from "@ui/schema/vehicle";
+import { NewVehicle, Vehicle } from "@ui/schema/vehicle";
 import { vehicleController } from "@ui/controller/vehicle";
 import {
   Pagination,
@@ -53,6 +52,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { toast } from "react-toastify";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function Manage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -60,15 +61,62 @@ export default function Manage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalVehicles, setTotalVehicles] = useState(0);
 
-  useEffect(() => {
-    vehicleController
-      .get({ page: currentPage })
-      .then(({ vehicles, pages, total }) => {
-        setVehicles(vehicles);
-        setTotalPages(pages);
-        setTotalVehicles(total);
+  const queryClient = useQueryClient();
+
+  useQuery({
+    queryKey: ["vehicles", currentPage],
+    queryFn: async () => {
+      await vehicleController
+        .get({ page: currentPage })
+        .then(({ vehicles, pages, total }) => {
+          setVehicles(vehicles);
+          setTotalPages(pages);
+          setTotalVehicles(total);
+        });
+    },
+  });
+
+  const { mutate: deleteById } = useMutation({
+    mutationFn: async (id: string) => {
+      await vehicleController.deleteById(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+      toast.success("Veículo excluído", {
+        toastId: "deletedVehicle",
+        pauseOnHover: false,
       });
-  }, [currentPage]);
+    },
+    onError: () => {
+      toast.error("Não foi possível excluir", {
+        toastId: "failedDeletingVehicle",
+        pauseOnHover: false,
+      });
+    },
+  });
+
+  const { mutateAsync: create } = useMutation({
+    mutationFn: async (data: NewVehicle) => {
+      await vehicleController.create({
+        vehicle: data,
+        onSuccess() {
+          queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+          toast.success("Veículo adicionado", {
+            toastId: "addedVehicle",
+            pauseOnHover: false,
+          });
+        },
+        onError() {
+          toast.error("Erro ao adicionar veículo", {
+            toastId: "failedAddingVehicle",
+            pauseOnHover: false,
+          });
+          throw new Error("Erro ao adicionar veículo");
+        },
+      });
+      return;
+    },
+  });
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -175,7 +223,7 @@ export default function Manage() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center">
               <div className="ml-auto flex items-center gap-2">
-                <AddVehicle />
+                <AddVehicle create={create} />
               </div>
             </div>
             <Card x-chunk="dashboard-06-chunk-0">
@@ -256,14 +304,7 @@ export default function Manage() {
                                 <DropdownMenuItem
                                   className="gap-1"
                                   onClick={() => {
-                                    vehicleController
-                                      .deleteById(vehicle.id)
-                                      .then(() => {
-                                        toast.success("Veículo excluído");
-                                      })
-                                      .catch(() => {
-                                        toast.error("Não foi possível excluir");
-                                      });
+                                    deleteById(vehicle.id);
                                   }}
                                 >
                                   <Trash2 className="h-3.5 w-3.5" />

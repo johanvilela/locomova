@@ -13,11 +13,17 @@ import { Label } from "@/components/ui/label";
 import { PlusCircle } from "lucide-react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { NewVehicleFormInputs, NewVehicleFormSchema } from "@ui/schema/vehicle";
-import { vehicleController } from "@ui/controller/vehicle";
-import { toast } from "react-toastify";
+import {
+  NewVehicle,
+  NewVehicleFormInputs,
+  NewVehicleFormSchema,
+} from "@ui/schema/vehicle";
 
-export default function AddVehicle() {
+interface AddVehicleParams {
+  create: (data: NewVehicle) => Promise<void>;
+}
+
+export default function AddVehicle({ create }: AddVehicleParams) {
   const {
     register,
     handleSubmit,
@@ -33,17 +39,14 @@ export default function AddVehicle() {
     },
   });
 
-  const onSubmit: SubmitHandler<NewVehicleFormInputs> = (data) => {
-    vehicleController.create({
-      vehicle: data,
-      onSuccess() {
-        toast.success("Veículo adicionado");
+  const onSubmit: SubmitHandler<NewVehicleFormInputs> = (data: NewVehicle) => {
+    create(data)
+      .then(() => {
         reset();
-      },
-      onError() {
-        toast.error("Erro ao adicionar veículo");
-      },
-    });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   return (
