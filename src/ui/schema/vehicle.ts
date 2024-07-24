@@ -21,6 +21,16 @@ export const NewVehicleSchema = VehicleSchema.pick({
 
 export type NewVehicle = schema.infer<typeof NewVehicleSchema>;
 
+export const VehicleToBeUpdatedSchema = VehicleSchema.pick({
+  id: true,
+  name: true,
+  manufacturer: true,
+  model: true,
+  price: true,
+});
+
+export type VehicleToBeUpdated = schema.infer<typeof VehicleToBeUpdatedSchema>;
+
 export const NewVehicleFormSchema = schema.object({
   name: schema.string().trim().min(1, { message: "Insira o nome do veículo" }),
   manufacturer: schema

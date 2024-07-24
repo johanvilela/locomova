@@ -1,5 +1,10 @@
 import { vehicleRepository } from "@ui/repository/vehicle";
-import { NewVehicle, NewVehicleSchema } from "@ui/schema/vehicle";
+import {
+  NewVehicle,
+  NewVehicleSchema,
+  VehicleToBeUpdated,
+  VehicleToBeUpdatedSchema,
+} from "@ui/schema/vehicle";
 
 interface VehicleControllerGetParams {
   page: number;
@@ -27,9 +32,41 @@ function create({
     return;
   }
 
-  vehicleRepository.create(parsedData.data).then(() => {
-    onSuccess();
-  });
+  vehicleRepository
+    .create(parsedData.data)
+    .then(() => {
+      onSuccess();
+    })
+    .catch(() => {
+      onError();
+    });
+}
+
+interface VehicleControllerUpdateParams {
+  vehicle: VehicleToBeUpdated;
+  onError: () => void;
+  onSuccess: () => void;
+}
+function update({
+  vehicle,
+  onError,
+  onSuccess,
+}: VehicleControllerUpdateParams) {
+  const parsedData = VehicleToBeUpdatedSchema.safeParse(vehicle);
+  if (!parsedData.success) {
+    onError();
+    return;
+  }
+  const vehicleData = parsedData.data;
+
+  vehicleRepository
+    .update(vehicleData)
+    .then(() => {
+      onSuccess();
+    })
+    .catch(() => {
+      onError();
+    });
 }
 
 async function deleteById(id: string) {
@@ -39,5 +76,6 @@ async function deleteById(id: string) {
 export const vehicleController = {
   get,
   create,
+  update,
   deleteById,
 };

@@ -1,4 +1,9 @@
-import { NewVehicle, Vehicle, VehicleSchema } from "@ui/schema/vehicle";
+import {
+  NewVehicle,
+  Vehicle,
+  VehicleSchema,
+  VehicleToBeUpdated,
+} from "@ui/schema/vehicle";
 import { z as schema } from "zod";
 
 interface VehicleRepositoryGetParams {
@@ -58,6 +63,32 @@ async function create(vehicle: NewVehicle): Promise<void> {
   throw new Error("Failed to create vehicle");
 }
 
+async function update(vehicle: VehicleToBeUpdated) {
+  const id = vehicle.id;
+  const vehicleData = {
+    name: vehicle.name,
+    manufacturer: vehicle.manufacturer,
+    model: vehicle.model,
+    price: vehicle.price,
+  };
+  const response = await fetch(`/api/vehicles/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ...vehicleData,
+      image_path: "/cars/example-car.jpg",
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update vehicle");
+  }
+
+  return;
+}
+
 async function deleteById(id: string): Promise<void> {
   const response = await fetch(`/api/vehicles/${id}`, { method: "DELETE" });
 
@@ -71,5 +102,6 @@ async function deleteById(id: string): Promise<void> {
 export const vehicleRepository = {
   get,
   create,
+  update,
   deleteById,
 };

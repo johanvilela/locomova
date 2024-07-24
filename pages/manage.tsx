@@ -7,6 +7,7 @@ import {
   MoreHorizontal,
   PanelLeft,
   Pencil,
+  PlusCircle,
   Settings,
   Trash2,
 } from "lucide-react";
@@ -40,8 +41,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import AddVehicle from "@/components/addVehicle";
-import { NewVehicle, Vehicle } from "@ui/schema/vehicle";
+import HandleVehicle from "@/components/handleVehicle";
+import { NewVehicle, Vehicle, VehicleToBeUpdated } from "@ui/schema/vehicle";
 import { vehicleController } from "@ui/controller/vehicle";
 import {
   Pagination,
@@ -54,6 +55,7 @@ import {
 import { toast } from "react-toastify";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 
 export default function Manage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,12 +68,13 @@ export default function Manage() {
   useQuery({
     queryKey: ["vehicles", currentPage],
     queryFn: async () => {
-      await vehicleController
+      return await vehicleController
         .get({ page: currentPage })
         .then(({ vehicles, pages, total }) => {
           setVehicles(vehicles);
           setTotalPages(pages);
           setTotalVehicles(total);
+          return { vehicles, pages, total };
         });
     },
   });
@@ -111,10 +114,35 @@ export default function Manage() {
             toastId: "failedAddingVehicle",
             pauseOnHover: false,
           });
-          throw new Error("Erro ao adicionar veículo");
         },
       });
-      return;
+    },
+  });
+
+  const { mutateAsync: update } = useMutation({
+    mutationFn: async (data: VehicleToBeUpdated) => {
+      await vehicleController.update({
+        vehicle: {
+          id: data.id,
+          name: data.name,
+          manufacturer: data.manufacturer,
+          model: data.model,
+          price: data.price,
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+          toast.success("Alterações salvas", {
+            toastId: "updatedVehicle",
+            pauseOnHover: false,
+          });
+        },
+        onError() {
+          toast.error("Erro ao editar veículo", {
+            toastId: "failedEditingVehicle",
+            pauseOnHover: false,
+          });
+        },
+      });
     },
   });
 
@@ -198,6 +226,7 @@ export default function Manage() {
                 className="overflow-hidden rounded-full"
               >
                 <Image
+                  priority={true}
                   src="/placeholder-user.jpg"
                   width={36}
                   height={36}
@@ -223,10 +252,18 @@ export default function Manage() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center">
               <div className="ml-auto flex items-center gap-2">
-                <AddVehicle create={create} />
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button size="sm" className="h-8 gap-1">
+                      <PlusCircle className="h-3.5 w-3.5" />
+                      <span>Adicionar veículo</span>
+                    </Button>
+                  </DialogTrigger>
+                  <HandleVehicle mode="create" create={create} />
+                </Dialog>
               </div>
             </div>
-            <Card x-chunk="dashboard-06-chunk-0">
+            <Card>
               <CardHeader>
                 <CardTitle>Veículos</CardTitle>
                 <CardDescription>Gerencie todos os veículos.</CardDescription>
@@ -281,37 +318,48 @@ export default function Manage() {
                             }).format(vehicle.price)}
                           </TableCell>
                           <TableCell>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  aria-haspopup="true"
-                                  size="icon"
-                                  variant="ghost"
-                                >
-                                  <MoreHorizontal className="h-4 w-4" />
-                                  <span className="sr-only">
-                                    Menu de opções
-                                  </span>
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Opções</DropdownMenuLabel>
-                                <DropdownMenuItem className="gap-1">
-                                  <Pencil className="h-3.5 w-3.5" />
-                                  Editar
-                                  {/* TODO: implements update */}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  className="gap-1"
-                                  onClick={() => {
-                                    deleteById(vehicle.id);
-                                  }}
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                  Excluir
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <Dialog>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    aria-haspopup="true"
+                                    size="icon"
+                                    variant="ghost"
+                                  >
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">
+                                      Menu de opções
+                                    </span>
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuLabel>Opções</DropdownMenuLabel>
+                                  <DialogTrigger asChild>
+                                    <DropdownMenuItem
+                                      className="gap-1"
+                                      onSelect={(e) => e.preventDefault()}
+                                    >
+                                      <Pencil className="h-3.5 w-3.5" />
+                                      Editar
+                                    </DropdownMenuItem>
+                                  </DialogTrigger>
+                                  <HandleVehicle
+                                    mode="update"
+                                    vehicleToUpdate={vehicle}
+                                    update={update}
+                                  />
+                                  <DropdownMenuItem
+                                    className="gap-1"
+                                    onClick={() => {
+                                      deleteById(vehicle.id);
+                                    }}
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    Excluir
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </Dialog>
                           </TableCell>
                         </TableRow>
                       );
