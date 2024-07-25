@@ -1,4 +1,5 @@
 import { z as schema } from "zod";
+import { currencyStringToNumber } from "@ui/masks/currency";
 
 export const VehicleSchema = schema.object({
   id: schema.string().uuid(),
@@ -43,10 +44,12 @@ export const NewVehicleFormSchema = schema.object({
     .min(1, { message: "Insira o modelo do veículo" }),
   price: schema
     .string()
-    .trim()
     .min(1, { message: "Insira o preço do veículo" })
+    .refine((priceString) => priceString !== "R$ " && priceString !== "R$", {
+      message: "Insira o preço do veículo",
+    })
     .transform((priceString) => {
-      return Number(priceString);
+      return currencyStringToNumber(priceString);
     }),
 });
 

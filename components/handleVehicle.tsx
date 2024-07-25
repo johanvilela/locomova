@@ -17,6 +17,7 @@ import {
   Vehicle,
   VehicleToBeUpdated,
 } from "@ui/schema/vehicle";
+import { normalizeCurrency } from "@ui/masks/currency";
 
 interface HandleVehicleParams {
   create?: (data: NewVehicle) => Promise<void>;
@@ -35,7 +36,10 @@ export default function HandleVehicle({
     name: vehicleToUpdate?.name || "",
     manufacturer: vehicleToUpdate?.manufacturer || "",
     model: vehicleToUpdate?.model || "",
-    price: (vehicleToUpdate?.price as number) || ("" as unknown as number), // coerce to use reset() function
+    price:
+      (normalizeCurrency(
+        vehicleToUpdate?.price.toFixed(2)
+      ) as unknown as number) || ("R$ " as unknown as number),
   };
 
   const {
@@ -46,6 +50,7 @@ export default function HandleVehicle({
   } = useForm<NewVehicleFormInputs>({
     resolver: zodResolver(NewVehicleFormSchema),
     defaultValues: defaultValues,
+    reValidateMode: "onChange",
   });
 
   const onSubmit: SubmitHandler<NewVehicleFormInputs> = (data: NewVehicle) => {
@@ -126,7 +131,18 @@ export default function HandleVehicle({
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="price">Preço</Label>
-          <Input type="number" id="price" {...register("price")} />
+          <Input
+            type="text"
+            id="price"
+            {...register("price", {
+              onChange(e) {
+                e.target.value = normalizeCurrency(e.target.value);
+              },
+            })}
+            // onChange={(e) => {
+            //   e.target.value = normalizeCurrency(e.target.value);
+            // }}
+          />
           <span className="text-xs text-red-400 text-center">
             {errors.price?.message}
           </span>
