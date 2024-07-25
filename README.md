@@ -14,7 +14,8 @@
 #
 
 ![screenshot](/public/screenshots/screenshot-mobile.png)
-![screenshot](/public/screenshots/screenshot-desktop.png)
+![screenshot](/public/screenshots/screenshot-desktop-1.png)
+![screenshot](/public/screenshots/screenshot-desktop-2.png)
 
 ## Demo
 
@@ -27,6 +28,8 @@ Para executar este projeto, você precisará adicionar as seguintes variáveis d
 `SUPABASE_URL`
 
 `SUPABASE_PRIVATE_KEY`
+
+`JWT_SECRET`
 
 ## Documentação da API
 
@@ -52,6 +55,7 @@ npm install
 ```
 SUPABASE_URL=
 SUPABASE_PRIVATE_KEY=
+JWT_SECRET=
 ```
 
 4. Inicie o servidor de desenvolvimento
