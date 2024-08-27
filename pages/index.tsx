@@ -19,10 +19,12 @@ import { vehicleController } from "@ui/controller/vehicle";
 import { Vehicle } from "@ui/schema/vehicle";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { LogOut, Settings } from "lucide-react";
+import { LogOut, LogIn, Settings } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/src/ui/context/AuthContext";
 
 export default function Page() {
+  const { auth } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -61,16 +63,7 @@ export default function Page() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
-              <Link href={"/manage"}>
-                <DropdownMenuItem className="gap-1">
-                  <Settings className="h-5 w-5" />
-                  Gerenciar
-                </DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem className="gap-1">
-                <LogOut className="h-5 w-5" />
-                Sair
-              </DropdownMenuItem>
+              {!auth ? <LogInMenuItens /> : <LogOutMenuItens />}
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
@@ -149,6 +142,38 @@ export default function Page() {
           )}
         </main>
       </div>
+    </>
+  );
+}
+
+function LogInMenuItens() {
+  return (
+    <>
+      <Link href={"/login"}>
+        <DropdownMenuItem className="gap-1">
+          <LogIn className="h-5 w-5" />
+          Entrar
+        </DropdownMenuItem>
+      </Link>
+    </>
+  );
+}
+
+function LogOutMenuItens() {
+  const { handleLogout } = useAuth();
+
+  return (
+    <>
+      <Link href={"/manage"}>
+        <DropdownMenuItem className="gap-1">
+          <Settings className="h-5 w-5" />
+          Gerenciar
+        </DropdownMenuItem>
+      </Link>
+      <DropdownMenuItem className="gap-1" onClick={handleLogout}>
+        <LogOut className="h-5 w-5" />
+        Sair
+      </DropdownMenuItem>
     </>
   );
 }

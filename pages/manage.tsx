@@ -4,6 +4,7 @@ import {
   Car,
   Home,
   LogOut,
+  LoaderCircle,
   MoreHorizontal,
   PanelLeft,
   Pencil,
@@ -56,12 +57,17 @@ import { toast } from "react-toastify";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { useAuth } from "@/src/ui/context/AuthContext";
+import router from "next/router";
 
 export default function Manage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalVehicles, setTotalVehicles] = useState(0);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  const { auth, handleLogout } = useAuth();
 
   const queryClient = useQueryClient();
 
@@ -145,6 +151,23 @@ export default function Manage() {
       });
     },
   });
+
+  function redirectToLoginPage() {
+    router.push("/login");
+  }
+
+  if (!auth) {
+    if (!isRedirecting) {
+      setIsRedirecting(true);
+      redirectToLoginPage();
+    }
+
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <LoaderCircle className="h-5 w-5 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -237,16 +260,10 @@ export default function Manage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
-              <DropdownMenuItem className="gap-1">
-                <Settings className="h-5 w-5" />
-                Gerenciar
+              <DropdownMenuItem className="gap-1" onClick={handleLogout}>
+                <LogOut className="h-5 w-5" />
+                Sair
               </DropdownMenuItem>
-              <Link href={"/"}>
-                <DropdownMenuItem className="gap-1">
-                  <LogOut className="h-5 w-5" />
-                  Sair
-                </DropdownMenuItem>
-              </Link>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
