@@ -15,7 +15,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
         <AuthProvider>
           <TooltipProvider>
             <Component {...pageProps} />
-            <ToastContainer />
+            <ToastContainer theme="colored" />
           </TooltipProvider>
         </AuthProvider>
       </QueryClientProvider>
