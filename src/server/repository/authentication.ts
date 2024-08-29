@@ -25,7 +25,7 @@ export const authenticationRepository = {
 };
 
 async function generateAccessToken(username: string) {
-  const secret = new TextEncoder().encode(process.env.SUPABASE_URL);
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
   const alg = "HS256";
 
   const jwt = await new jose.SignJWT({ username: username })
