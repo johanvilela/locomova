@@ -48,6 +48,7 @@ async function create(vehicle: NewVehicle): Promise<void> {
   const response = await fetch("api/vehicles", {
     method: "POST",
     headers: {
+      Authorization: `Bearer ${localStorage.getItem("access-token")}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -74,6 +75,7 @@ async function update(vehicle: VehicleToBeUpdated) {
   const response = await fetch(`/api/vehicles/${id}`, {
     method: "PUT",
     headers: {
+      Authorization: `Bearer ${localStorage.getItem("access-token")}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -90,7 +92,12 @@ async function update(vehicle: VehicleToBeUpdated) {
 }
 
 async function deleteById(id: string): Promise<void> {
-  const response = await fetch(`/api/vehicles/${id}`, { method: "DELETE" });
+  const response = await fetch(`/api/vehicles/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("access-token")}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Failed to delete");
