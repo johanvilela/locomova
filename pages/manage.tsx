@@ -312,16 +312,14 @@ export default function Manage() {
                       return (
                         <TableRow key={vehicle.id}>
                           <TableCell className="hidden sm:table-cell">
-                            <div className="w-16 bg-slate-800 text-slate-200 flex justify-center items-center aspect-square rounded-md">
-                              <Car size={48} strokeWidth={1} />
+                            <div className="w-16 relative aspect-square rounded-md overflow-hidden">
+                              <Image
+                                src={vehicle.image_path}
+                                alt={"foto do carro"}
+                                fill={true}
+                                objectFit="cover"
+                              />
                             </div>
-                            {/* <Image
-                              alt="Product image"
-                              className="aspect-square rounded-md object-cover"
-                              height="64"
-                              src="/placeholder.svg"
-                              width="64"
-                            /> */}
                           </TableCell>
                           <TableCell className="font-medium">
                             {vehicle.name}

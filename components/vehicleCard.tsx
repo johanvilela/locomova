@@ -1,4 +1,4 @@
-import { Car } from "lucide-react";
+import Image from "next/image";
 
 interface VehicleCardProps {
   name: string;
@@ -13,13 +13,19 @@ export default function VehicleCard({
   manufacturer,
   model,
   price,
+  imagePath,
 }: VehicleCardProps) {
   return (
     <>
       <div className="border rounded-lg border-slate-300 h-32  flex flex-row overflow-hidden">
         {/* Picture of car */}
-        <div className="w-32 bg-slate-800 text-slate-200 flex justify-center items-center">
-          <Car size={48} strokeWidth={1} />
+        <div className="relative aspect-square">
+          <Image
+            src={imagePath}
+            alt={"foto do carro"}
+            fill={true}
+            objectFit="cover"
+          />
         </div>
         {/* Details about */}
         <div className=" flex flex-col flex-1 p-2">
