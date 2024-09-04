@@ -17,7 +17,7 @@ export default function VehicleCard({
 }: VehicleCardProps) {
   return (
     <>
-      <div className="border rounded-lg border-slate-300 h-32  flex flex-row overflow-hidden">
+      <div className="border rounded-lg border-slate-300 bg-slate-50 h-32  flex flex-row overflow-hidden items-center">
         {/* Picture of car */}
         <div className="h-24 ml-4 mr-1 relative aspect-video rounded-md overflow-hidden">
           <Image
