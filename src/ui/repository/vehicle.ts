@@ -53,7 +53,6 @@ async function create(vehicle: NewVehicle): Promise<void> {
     },
     body: JSON.stringify({
       ...vehicle,
-      image_path: "/cars/example-car.jpg",
     }),
   });
 
@@ -71,6 +70,7 @@ async function update(vehicle: VehicleToBeUpdated) {
     manufacturer: vehicle.manufacturer,
     model: vehicle.model,
     price: vehicle.price,
+    image_path: vehicle.image_path,
   };
   const response = await fetch(`/api/vehicles/${id}`, {
     method: "PUT",
@@ -80,7 +80,6 @@ async function update(vehicle: VehicleToBeUpdated) {
     },
     body: JSON.stringify({
       ...vehicleData,
-      image_path: "/cars/example-car.jpg",
     }),
   });
 

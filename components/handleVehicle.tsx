@@ -18,6 +18,54 @@ import {
   VehicleToBeUpdated,
 } from "@ui/schema/vehicle";
 import { normalizeCurrency } from "@ui/masks/currency";
+import "@uppy/core/dist/style.min.css";
+import "@uppy/dashboard/dist/style.min.css";
+import { Uppy } from "@uppy/core";
+import { Dashboard as FileUploader } from "@uppy/react";
+import Tus, { TusDetailedError } from "@uppy/tus";
+import Portuguese from "@uppy/locales/lib/pt_BR";
+import { useState } from "react";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabasePrivateKey = process.env.NEXT_PUBLIC_SUPABASE_PRIVATE_KEY || "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabaseBucketName = process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME || "";
+const supabasePublicPath = "/storage/v1/object/public";
+const supabaseTusPath = "/storage/v1/upload/resumable";
+
+const uppyOptions = {
+  locale: {
+    ...Portuguese,
+    strings: {
+      ...Portuguese.strings,
+      browseFiles: "escolha",
+      dropPasteFiles: "Arraste uma imagem aqui ou %{browse}",
+    },
+  },
+  restrictions: {
+    maxNumberOfFiles: 1,
+    allowedFileTypes: [".png", ".jpeg", ".jpg"],
+  },
+};
+
+const tusOptions = {
+  endpoint: supabaseUrl + supabaseTusPath,
+  headers: {
+    authorization: `Bearer ${supabasePrivateKey}`,
+    apikey: supabaseAnonKey,
+  },
+  uploadDataDuringCreation: true,
+  chunkSize: 6 * 1024 * 1024,
+  allowedMetaFields: [
+    "bucketName",
+    "objectName",
+    "contentType",
+    "cacheControl",
+  ],
+  onError: function (error: TusDetailedError | Error) {
+    console.error("Tus error:", error);
+  },
+};
 
 interface HandleVehicleParams {
   create?: (data: NewVehicle) => Promise<void>;
@@ -40,12 +88,16 @@ export default function HandleVehicle({
       (normalizeCurrency(
         vehicleToUpdate?.price.toFixed(2)
       ) as unknown as number) || ("R$ " as unknown as number),
+    imageUrl: vehicleToUpdate?.image_path || "",
   };
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    clearErrors,
+    setError,
     formState: { errors },
   } = useForm<NewVehicleFormInputs>({
     resolver: zodResolver(NewVehicleFormSchema),
@@ -53,23 +105,84 @@ export default function HandleVehicle({
     reValidateMode: "onChange",
   });
 
-  const onSubmit: SubmitHandler<NewVehicleFormInputs> = (data: NewVehicle) => {
+  const onSubmit: SubmitHandler<NewVehicleFormInputs> = async (
+    data: NewVehicleFormInputs
+  ) => {
     if (mode === "create" && !!create) {
-      create(data).then(() => {
-        reset();
-      });
+      const response = await uppy.upload();
+      if (response && response.successful && response.successful.length > 0) {
+        create({ ...data, image_path: data.imageUrl }).then(() => {
+          reset();
+          uppy.clear();
+        });
+      } else {
+        setError("imageUrl", {
+          message: "Tente outra imagem",
+        });
+      }
     }
 
     if (mode === "update" && !!update && !!vehicleToUpdate) {
-      update({
-        id: vehicleToUpdate.id,
-        ...data,
-      }).then(() => {
-        // TODO: Close Dialog
-      });
+      if (!changePhoto) {
+        update({
+          id: vehicleToUpdate.id,
+          ...data,
+          image_path: data.imageUrl,
+        }).then(() => {
+          // TODO: Close Dialog
+        });
+      } else {
+        const response = await uppy.upload();
+        if (response && response.successful && response.successful.length > 0) {
+          update({
+            id: vehicleToUpdate.id,
+            ...data,
+            image_path: data.imageUrl,
+          }).then(() => {
+            uppy.clear();
+            setChangePhoto(false);
+            // TODO: Close Dialog
+          });
+        } else {
+          setError("imageUrl", {
+            message: "Tente outra imagem",
+          });
+        }
+      }
     }
   };
 
+  const [uppy] = useState(() => new Uppy(uppyOptions).use(Tus, tusOptions));
+
+  // TODO: rename file before upload to avoid duplicated filenames (prefix vehicle id)
+  uppy.on("file-added", (file) => {
+    const supabaseMetadata = {
+      bucketName: supabaseBucketName,
+      objectName: file.name,
+      contentType: file.type,
+    };
+
+    file.meta = {
+      ...file.meta,
+      ...supabaseMetadata,
+    };
+
+    setValue(
+      "imageUrl",
+      `${supabaseUrl}${supabasePublicPath}/${supabaseBucketName}/${file.name}`
+    );
+    clearErrors("imageUrl");
+  });
+
+  uppy.on("file-removed", () => {
+    setValue("imageUrl", "");
+  });
+
+  uppy.on("cancel-all", () => {
+    clearErrors("imageUrl");
+  });
+
+  const [changePhoto, setChangePhoto] = useState(false);
   return (
     <DialogContent>
       <DialogHeader>
@@ -139,25 +252,42 @@ export default function HandleVehicle({
                 e.target.value = normalizeCurrency(e.target.value);
               },
             })}
-            // onChange={(e) => {
-            //   e.target.value = normalizeCurrency(e.target.value);
-            // }}
           />
           <span className="text-xs text-red-400 text-center">
             {errors.price?.message}
           </span>
         </div>
 
-        {/* TODO: upload image */}
-        {/* <div className="flex flex-col gap-2">
-              <Label htmlFor="image">Foto</Label>
-              <Input
-                type="file"
-                id="image"
-                accept="image/*"
-                // {...register("image")}
-              />
-            </div> */}
+        <Label>Foto</Label>
+        {mode === "update" && !changePhoto && (
+          <Button
+            variant={"secondary"}
+            onClick={() => {
+              setChangePhoto(true);
+              setValue("imageUrl", "");
+            }}
+          >
+            Trocar foto
+          </Button>
+        )}
+        {(mode === "create" || changePhoto) && (
+          <FileUploader
+            uppy={uppy}
+            hideUploadButton
+            height={"100%"}
+            width={"100%"}
+          />
+        )}
+
+        <span className="text-xs text-red-400 text-center">
+          {errors.imageUrl?.message}
+        </span>
+        <Input
+          className="hidden"
+          type="url"
+          id="image-url"
+          {...register("imageUrl")}
+        />
       </form>
       <DialogFooter>
         {mode === "create" && (

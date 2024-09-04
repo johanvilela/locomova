@@ -134,6 +134,7 @@ export default function Manage() {
           manufacturer: data.manufacturer,
           model: data.model,
           price: data.price,
+          image_path: data.image_path,
         },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["vehicles"] });

@@ -86,6 +86,38 @@ async function updateById({
   price,
   image_path,
 }: Partial<Vehicle>): Promise<Vehicle> {
+  // Get current vehicle image URL
+  const { data: vehicleData, error: vehicleError } = await supabase
+    .from("vehicles")
+    .select("image_path")
+    .match({ id })
+    .single();
+  if (vehicleError)
+    throw new HttpNotFoundError(`Vehicle with id "${id}" not found`);
+
+  const currentImageUrl = vehicleData.image_path as string;
+  const newImageUrl = image_path as string;
+
+  if (newImageUrl !== currentImageUrl) {
+    const currentImageName = currentImageUrl.split("/").pop() as string;
+
+    // Check if image exists
+    const { data: imageData } = await supabase.storage
+      .from("cars")
+      .download(currentImageName);
+    if (!imageData)
+      throw new Error(`Image with name "${currentImageName}" not found`);
+
+    // Delete current image from file storage
+    const { data: deletedData, error: deleteError } = await supabase.storage
+      .from("cars")
+      .remove([currentImageName]);
+    if (deleteError)
+      throw new Error(`Can't delete image "${currentImageName}"`);
+    if (deletedData.length === 0)
+      throw new Error(`Can't delete image "${currentImageName}"`);
+  }
+
   const { data, error } = await supabase
     .from("vehicles")
     .update({

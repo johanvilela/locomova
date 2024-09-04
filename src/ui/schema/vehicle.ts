@@ -18,6 +18,7 @@ export const NewVehicleSchema = VehicleSchema.pick({
   manufacturer: true,
   model: true,
   price: true,
+  image_path: true,
 });
 
 export type NewVehicle = schema.infer<typeof NewVehicleSchema>;
@@ -28,6 +29,7 @@ export const VehicleToBeUpdatedSchema = VehicleSchema.pick({
   manufacturer: true,
   model: true,
   price: true,
+  image_path: true,
 });
 
 export type VehicleToBeUpdated = schema.infer<typeof VehicleToBeUpdatedSchema>;
@@ -51,6 +53,7 @@ export const NewVehicleFormSchema = schema.object({
     .transform((priceString) => {
       return currencyStringToNumber(priceString);
     }),
+  imageUrl: schema.string().min(1, { message: "Adicione uma foto do veículo" }),
 });
 
 export type NewVehicleFormInputs = schema.infer<typeof NewVehicleFormSchema>;
