@@ -25,9 +25,13 @@
 
 Para executar este projeto, você precisará adicionar as seguintes variáveis de ambiente ao seu arquivo .env
 
-`SUPABASE_URL`
+`NEXT_PUBLIC_SUPABASE_URL`
 
-`SUPABASE_PRIVATE_KEY`
+`NEXT_PUBLIC_SUPABASE_PRIVATE_KEY`
+
+`NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+`NEXT_PUBLIC_SUPABASE_BUCKET_NAME`
 
 `JWT_SECRET`
 
@@ -53,8 +57,10 @@ npm install
 3. Configure as variáveis de ambiente no arquivo `.env`
 
 ```
-SUPABASE_URL=
-SUPABASE_PRIVATE_KEY=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PRIVATE_KEY=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_BUCKET_NAME=
 JWT_SECRET=
 ```
 
