@@ -108,9 +108,40 @@ async function updateById({
 }
 
 async function deleteById(id: string) {
-  const { error } = await supabase.from("vehicles").delete().match({ id });
+  // Get vehicle image URL
+  const { data: vehicleData, error: vehicleError } = await supabase
+    .from("vehicles")
+    .select("image_path")
+    .match({ id })
+    .single();
 
-  if (error) throw new HttpNotFoundError(`Vehicle with id "${id}" not found`);
+  if (vehicleError)
+    throw new HttpNotFoundError(`Vehicle with id "${id}" not found`);
+
+  const imageUrl = vehicleData.image_path as string;
+  const imageName = imageUrl.split("/").pop() as string;
+
+  // Check if image exists
+  const { data: imageData } = await supabase.storage
+    .from("cars")
+    .download(imageName);
+  if (!imageData) throw new Error(`Image with name "${imageName}" not found`);
+
+  // Delete image
+  const { data: deletedData, error: deleteError } = await supabase.storage
+    .from("cars")
+    .remove([imageName]);
+  if (deleteError) throw new Error(`Can't delete image "${imageName}"`);
+  if (deletedData.length === 0)
+    throw new Error(`Can't delete image "${imageName}"`);
+
+  // Delete vehicle data from database
+  const { error: deletingError } = await supabase
+    .from("vehicles")
+    .delete()
+    .match({ id });
+  if (deletingError)
+    throw new HttpNotFoundError(`Vehicle with id "${id}" not found`);
 }
 
 export const vehicleRepository = {
