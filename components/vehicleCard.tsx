@@ -19,7 +19,7 @@ export default function VehicleCard({
     <>
       <div className="border rounded-lg border-slate-300 h-32  flex flex-row overflow-hidden">
         {/* Picture of car */}
-        <div className="relative aspect-square">
+        <div className="h-24 ml-4 mr-1 relative aspect-video rounded-md overflow-hidden">
           <Image
             src={imagePath}
             alt={"foto do carro"}

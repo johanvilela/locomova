@@ -313,7 +313,7 @@ export default function Manage() {
                       return (
                         <TableRow key={vehicle.id}>
                           <TableCell className="hidden sm:table-cell">
-                            <div className="w-16 relative aspect-square rounded-md overflow-hidden">
+                            <div className="w-16 relative aspect-video rounded-md overflow-hidden">
                               <Image
                                 src={vehicle.image_path}
                                 alt={"foto do carro"}
